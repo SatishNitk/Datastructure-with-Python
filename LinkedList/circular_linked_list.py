@@ -31,7 +31,7 @@ class Circular_linked_list:
         ele.append(curr.data)
         print(ele)
 
-    def lenght(self):
+    def length(self):
         curr = self.head
         counter = 0
         while curr.next != self.head:
@@ -50,6 +50,6 @@ circular_linked_list.append(33)
 circular_linked_list.append(332)
 
 circular_linked_list.display()
-print("Length:- ",circular_linked_list.lenght())
+print("Length:- ",circular_linked_list.length())
 
 
