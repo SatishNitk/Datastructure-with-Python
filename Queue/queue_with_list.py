@@ -1,4 +1,5 @@
 """ Assume list as a normal array. all element stored in contiguous memory location  """
+import inspect 
 
 class Queue:
 
@@ -25,6 +26,12 @@ class Queue:
     def isempty(self):
         return False if len(self.queue) else True
 
+    @staticmethod
+    def get_code():
+        """
+        return the code for the current class
+        """
+        return inspect.getsource(Queue)
 
 
 queue = Queue()
@@ -41,6 +48,8 @@ print(queue.isempty())
 queue.enqueue(5)
 queue.delete()
 print(queue.isempty())
+print("Code of current class \n\n")
+print(Queue.get_code())
 
 
 
