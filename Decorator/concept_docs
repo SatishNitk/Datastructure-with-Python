@@ -1,0 +1,424 @@
+****************************** USE CASE FOR DECORATOR ******************************
+
+Let's assume we are executing a piece of code that is taking a bit longer to execute than we would like. The piece of code is made up of a bunch of function calls and we are convinced that at least one of those calls constitutes a bottleneck in our code. How do we find the bottleneck? One solution, the solution we will focus on now, is to time function execution.
+
+** Lets suppose this is your function ans we wanna check how long it is taking time
+
+def func_a(stuff):
+    do_important_things_1()
+    do_important_things_2()
+    do_important_things_3()
+
+**one way we can do is putting timing code aroung the function call
+
+  like this:- 
+
+    before = datetime.datetime.now()
+    func_a(current_stuff)
+    after = datetime.datetime.now()
+    print "Elapsed Time = {0}".format(after-before)
+
+Thats work find but what happened if we call that function from 10 places. we have to include time concept arroung every 10 function call. thats not good.
+
+
+ **sol:--  So why don't we put time inside function itself that will solved this problem 
+
+def func_a(stuff):
+    before = datetime.datetime.now()
+    do_important_things_1()
+    do_important_things_2()
+    do_important_things_3()
+    after = datetime.datetime.now()
+    print "Elapsed Time = {0}".format(after-before)
+
+**Prob :- But lets suppose   we have multiple function (IN above example there in only one function) so we have to put this code in all function thats not a good idea.
+
+
+
+
+
+---********************* Function return function objects :-**************************
+def get_function():
+    print "inside get_function"                 
+    def returned_function():                    
+        print "inside returned_function"        
+        return 1
+    print "outside returned_function"
+    return returned_function
+   
+returned_function()    o/p NameError: returned_function does not exists
+x = get_function()     o/p X will carry the object of inner function   and it will print "inside get _fucntion" and  outside get_function
+x                       o/p: Print bject value that is return by get_function                      
+x()                     it will call the inner function , because x i having object of inner funtion . So it will print      "insde return_function" and 1
+
+
+** So lets put function return function concept in above problem and solved it ----------------------------
+
+
+def time_this(original_function):                            # 1
+    def new_function(*args,**kwargs):                        # 2
+        before = datetime.datetime.now()                     # 3
+        x = original_function(*args,**kwargs)                # 4
+        after = datetime.datetime.now()                      # 5
+        print "Elapsed Time = {0}".format(after-before)      # 6
+        return x                                             # 7
+    return new_function()                                    # 8
+
+
+
+call :-- 
+    def func_a(stuff):
+        do_important_things_1()
+        do_important_things_2()
+        do_important_things_3()
+    func_a = time_this(func_a)        It will can time_this function with fun_a as a argumets and return the new_function object
+    func_a() :- func_a is having inner funcion object o it will call the inner function wit time concept
+
+    *** other way to call  thease two are same *********
+
+     @time_this   
+     def func_a(stuff):
+        do_important_things_1()
+        do_important_things_2()
+        do_important_things_3()
+
+
+
+** The above concept is called decorator **************
+
+-------------------------------------------------------------------------------------------
+** EXAMPLE FOR DECORAOR :-- WITH FUNCTION
+
+def time_this(original_function):      
+    def new_function(*args,**kwargs):
+        import datetime 
+        print("inner function start", args)
+        before = datetime.datetime.now()                     
+        x = original_function(*args,**kwargs)                
+        after = datetime.datetime.now()                      
+        print("Elapsed Time = {0}".format(after-before))
+        return x                                             
+    return new_function                                   
+    
+@time_this
+def func_a(stuff):
+    import time
+    time.sleep(3)
+    print("in last")
+    return "satish"
+
+k = func_a(1)
+print(k)
+
+
+flow of execution:--        
+1. Calling the func_a(1)  it will call the fun_a(1) with arge value 1
+2. Then in function func_a(stuff) it will see there is a decorator above that so it will call the decorator and currectn function(func_a) as a arguments of decorator and function arguments(stuff) will be arguments of inner functionof decorator
+
+2. so at last decorator function will rturn the x that will assign to k 
+4. print the value of k
+
+O/P : 
+
+inner function start (1,)                                                        
+in last                                                                          
+Elapsed Time = 0:00:03.003031                                                    
+satish
+
+
+
+-----------Decorator with arguments **********************************************
+
+def do_something(*args, **kwargs):
+    print("sart of extra work", args, *kwargs)
+    
+    
+    
+def outer_decorator(*outer_args,**outer_kwargs):                            
+    def decorator(fn):                                            
+        def decorated(*args,**kwargs):                            
+            do_something(*outer_args,**outer_kwargs)                      
+            return fn(*args,**kwargs)                         
+        return decorated                                          
+    return decorator       
+    
+@outer_decorator(1,2,3)
+def foo(a,b,c):
+    print(a)
+    print(b)
+    print(c)
+
+
+foo(4,5,6)
+
+O/P:
+
+sart of extra work (1, 2, 3)                                                     
+4                                                                                
+5                                                                                
+6
+
+
+
+
+*************************************************** ---   *args and **kwargs  -----****************
+
+
+*args : --- 1D array as a unknown number of argumenst
+
+**kwargs  : 2D array as a unknown number of arguments:
+
+
+EX- 1
+
+
+def myFun(arg1, arg2, arg3): 
+    print("arg1:", arg1) 
+    print("arg2:", arg2) 
+    print("arg3:", arg3) 
+      
+# Now we can use *args or **kwargs to 
+# pass arguments to this function :  
+args = ("Geeks", "for", "Geeks") 
+myFun(*args) 
+  
+kwargs = {"arg1" : "Geeks", "arg2" : "for", "arg3" : "Geeks"} 
+myFun(**kwargs) 
+
+o/p :
+
+arg1: Geeks
+arg2: for
+arg3: Geeks
+arg1: Geeks
+arg2: for
+arg3: Geeks
+
+
+EX- 2
+
+
+def myFun(*args,**kwargs): 
+    print("args: ", args) 
+    print("kwargs: ", kwargs) 
+
+k = {"first" : "Geeks","mid" : "for","last" :"Geeks"}
+myFun('geeks','for','geeks',k)               #HEre k is going as a dictionary args to *args
+myFun('geeks','for','geeks',**k) 
+
+args:  ('geeks', 'for', 'geeks', {'mid': 'for', 'last': 'Geeks', 'first': 'Geeks'})
+kwargs:  {}
+args:  ('geeks', 'for', 'geeks')
+kwargs:  {'mid': 'for', 'last': 'Geeks', 'first': 'Geeks'}
+
+
+
+
+
+
+
+
+
+
+
+
+
+************************ __call__ in Python  **************************
+
+The __call__ method enables Python programmers to write classes where the instances behave like functions and can be called like a function
+
+EX- 1
+
+class Example: 
+    def __init__(self): 
+        print("Instance Created") 
+    
+    # Defining __call__ method 
+    def __call__(self): 
+        print("Instance is called via special method") 
+
+# Instance created 
+e = Example() 
+
+# __call__ method will be called 
+e() 
+
+
+
+o/p :
+Instance Created
+Instance is called via special method
+
+
+EX- 2
+
+class Product: 
+    def __init__(self): 
+        print("Instance Created") 
+
+    # Defining __call__ method 
+    def __call__(self, a, b): 
+        print(a * b) 
+
+# Instance created 
+ans = Product() 
+
+# __call__ method will be called 
+ans(10, 20) 
+
+
+o/p:
+
+Instance Created
+200
+
+
+EX- 3
+
+class Product:
+  def __init__(self):
+    print("Instance Created") 
+
+    # Defining __call__ method 
+  def __call__(self, *args, **kwargs):
+    print(args)
+    print(kwargs)
+
+# Instance created 
+ans = Product() 
+j = {"name": "satish"}
+# __call__ method will be called 
+ans(10, 20, **j) 
+
+
+o/p
+ 
+Instance Created
+(10, 20)
+{'name': 'satish'}
+
+
+
+
+
+------------------------------------------Decorating Classes ---------------
+
+
+
+
+Decorators are not limited to acting on functions, they can act on classes as well. Say for example we have a class that does a lot of very important stuff and we want to time everything it does. Then we could use our time_this decorator from before like so:
+
+
+
+class ImportantStuff(object):
+    @time_this
+    def do_stuff_1(self):
+        ...
+    @time_this
+    def do_stuff_2(self):
+        ...
+    @time_this
+    def do_stuff_3(self):
+
+That would work just fine. But it's quite a few extra lines of code within the class. And what if we write some more class methods and forget to decorate one of them? What if we decide we dont want to time the class any more? There is definitely space for human error here. It would be much nicer to write it like this
+
+
+
+@time_all_class_methods
+class ImportantStuff:
+    def do_stuff_1(self):
+        ...
+    def do_stuff_2(self):
+        ...
+    def do_stuff_3(self):
+        ...
+
+** its equvalent too*********
+
+class ImportantStuff:
+    def do_stuff_1(self):
+        ...
+    def do_stuff_2(self):
+        ...
+    def do_stuff_3(self):
+        ...
+        
+ImportantStuff = time_all_class_methods(ImportantStuff)
+
+
+
+
+EX-1 
+
+
+def check_positive(func):
+    def func_wrapper(*args):
+        for arg in args:
+            if type(arg) is int or type(arg) is float:
+                if arg < 0:
+                    raise Exception("Method {} takes only positive arguments".format(func.__name__))
+        return func(*args)
+
+    return func_wrapper
+    
+class Operations:
+    @check_positive
+    def average(self, x, y):
+        return (x + y)/2
+
+
+op = Operations()
+print(op.average(23,4))
+
+
+
+************** Class As a Decorator :--*********************************************************
+
+Recall that the decorator syntax @my_decorator is just an easier way of saying func = my_decorator(func). Therefore, if my_decorator is a class, it needs to take func as an argument in its .__init__() method. Furthermore, the class needs to be callable so that it can stand in for the decorated function.
+
+
+
+
+class MyDecorator: 
+    def __init__(self, function): 
+        self.function = function 
+    
+    def __call__(self): 
+        self.function() 
+
+
+# adding class decorator to the function 
+@MyDecorator
+def function(): 
+    print("GeeksforGeeks") 
+function()
+              #   OR
+fun_object = MyDecorator(function)   # Init will be called here
+fun_object()                          # call will be called here
+
+
+
+
+EX-2
+
+# Python program showing 
+# class decorator with 
+# return satement 
+
+class SquareDecorator: 
+
+    def __init__(self, function): 
+        self.function = function 
+
+    def __call__(self, *args, **kwargs): 
+        result = self.function(*args, **kwargs) 
+        return result 
+
+@SquareDecorator
+def get_square(n): 
+    print("given number is:", n) 
+    return n * n 
+
+print("Square of number is:", get_square(195)) 
+
+

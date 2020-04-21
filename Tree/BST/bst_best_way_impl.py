@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 class node:
 
     def __init__(self, data = None):
@@ -107,13 +109,32 @@ class BST:
         self.print_all_path(root.left, ele, index)
         self.print_all_path(root.right, ele, index)
 
+    def check_for_sum_in_a_tree(self, root1, root2, total):
+        mapping = self.store_in_a_map(root2)
+        return self.check_for_number_in_a_tree(root1, total, mapping)
+
+    def check_for_number_in_a_tree(self, root, total, mapping):
+        if root != None:
+            print("map", root.data, mapping)
+            if mapping.get(total - root.data, 0):
+                return True
+            left = self.check_for_number_in_a_tree(root.left, total, mapping)
+            right = self.check_for_number_in_a_tree(root.right, total , mapping)
+            
+            return True if left or right else False
 
 
-
+    def store_in_a_map(self, root, dictionary = {}):
+        if root != None:
+            self.store_in_a_map(root.left, dictionary)
+            dictionary[root.data] = dictionary.get(root.data, 0) + 1
+            self.store_in_a_map(root.right, dictionary)
+        return dictionary
 
 
 
 bst = BST()
+"""
 BST.root = bst.insert(BST.root, 10)
 BST.root  = bst.insert(BST.root, 3)
 BST.root  = bst.insert(BST.root, 1)
@@ -170,3 +191,25 @@ root2.right.left.right = node(15)
 print(bst.check_for_mirror_image(root1, root2))
 
 #------------ end mirror image
+
+"""
+# To chechk give sum is available in a tree or not (One number from first tree and other number from another tree)
+
+root1 = node(11)
+root2 = node(5)
+
+root1.left = node(4)
+root1.right = node(6)
+root1.right.right = node(16)
+
+
+root2.left = node(3)
+root2.right = node(7)
+root2.right = node(17)
+
+
+
+print(bst.check_for_sum_in_a_tree(root1, root2, 3332))
+
+#-----------------------------------------------------------------------------------------------
+
