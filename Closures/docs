@@ -1,0 +1,164 @@
+https://towardsdatascience.com/closures-and-decorators-in-python-2551abbc6eb6
+
+**************************** SCOPE OF VARIABLES **************************
+
+Global scope:-->>>>>>      When a variable is defined outside all functions. A global  variable can be accessed by all the functions in the file.
+
+Local scope:-->>>>    When a variable is defined inside a function, it is local to that function. A local variable can be only accessed inside the function in which it was defined.
+
+Nonlocal scope:->>>>>>>  When a variable is assigned in an enclosing function, it is nonlocal to its nested functions. A nonlocal variable can be accessed by the function in which it was defined and all its nested functions(INNER FUNCTION).
+
+
+# Listing 1
+x = 1 # x is a global variable  
+y = 5 # y is a global variable 
+def f():
+    global y   # this allow me to access the global variable y, if we will not write  global keywork it will create a new variable as name y in local scope of function f
+    x = 2   # x is a local variable
+    y += 1  # Reassigning the global variable y
+    z = 10   # z is a local variable
+    print("Local variable x =", x)
+    print("Global variable y =", y)
+    print("Local variable z =", z)
+f()
+print("Global variable  x =", x)
+print("Global variable y =", y)
+
+
+
+*************************** INNER FUNCTIONS *************************************************************
+ The local variables of the outer function are said to be nonlocal to its inner function . The inner function can access the nonlocal variables but cannot change them. Reassigning them simply creates a new local variable with the same name in the inner function, and does not affect the nonlocal variable. So if you want to make a change to a nonlocal variable in a nested function, you must use the nonlocal keyword.
+
+# Listing 3
+def f(x):
+    y = 5
+    z = 10
+    t = 10
+    def g():
+        nonlocal y   # if you will not use nonlocal keyword, it will create a local variable name as y in function scope g, by mentioning nonlocal it is refering to parant function y.
+        y += 1
+        z = 20
+        print("Nonlocal variable x =", x)
+        print("Local variable z =", z) 
+    print("Local variable t =", t)    
+    g()
+    print("Nonlocal variable x =", x)
+    print("Nonlocal variable y =", y)
+    print("Local variable z =", z)
+f(5)
+
+g()  # This does not work
+
+
+
+problem : How to call g()   
+
+solution : Closure
+
+**************************************CLOSURE ***********************************************************
+
+But what if we could find a way to call it outside g(). Then we would have a second problem. After exiting the outer function, its local variables (which are nonlocal to g()) are not present in the memory anymore. In that case, the inner function can not access them anymore. Closures make it possible to call an inner function outside the outer function and still access its nonlocal variables.
+
+
+******* When should we use closure :--
+1. Closures provide some sort of data hiding as they are used as callback functions. This helps us to reduce  the use of global variables.
+2. Useful for replacing hard-coded constants
+3. Closures prove to be efficient way when we have few functions in our code.
+
+
+**************In conclusion here are the three criteria’s for a closure:*************
+
+1. There must be a nested function (a function inside another function).
+2. This nested function has to refer to a variable defined inside the enclosing function.
+3. The enclosing function must return the nested function.
+
+
+
+
+A closure is an inner function with an extended scope that encompasses nonlocal variables of the outer function. So it remembers the nonlocal variables in the enclosing scopes even if they are not present in memory
+
+
+It is important to note that to have a closure, the inner function should access the nonlocal variables of the outer function
+
+
+clousure EX1:- 
+
+def f(x):
+    z = 2
+    def g(y):
+        return z*x + y    #Even if f function is not available in memory but z variable is available because it is bound to function g 
+    return g
+a = 5
+b = 1
+h = f(a)
+h(b)  # Output is 11
+
+
+
+NOTE : - If there is no any enclosing variable  accessible inside inner function then its not a closure.
+EX:- Its not a closure
+
+def f(x):
+    z = 2
+    def g(y):
+        return y
+    return g
+a = 5
+b = 1
+h = f(a)
+h(b)  # Output is 1
+
+to confirm is this closure or not check the output of this
+
+print(h.__code__.co_freevars) if this is empty means no closure or else that is closure
+
+it will return the set of enclosing variable that is going to use by inner function.
+
+
+
+
+ex -2:  This is closure, even though we are not utilising the variable t, but that should be availeb in function g scope
+
+def f(x):
+    z = 2
+    t = 3
+    def g(y):
+        nonlocal t
+        return y
+    return g
+a = 5
+b = 1
+h = f(a)
+h(b)  
+print(h.__code__.co_freevars)  o/p : ('t',)
+
+
+
+ex -3  Its a closure, We are using directly variable z
+
+
+def f(x):
+    z = 2
+    def g(y):
+        return z*x + y    #Even if f function is not available in memory but z variable is available because it is bound to function g 
+    return g
+a = 5
+b = 1
+h = f(a)
+h(b)  # Output is 11
+
+Note: So we can access directly enclosing variable or by nonlocal keyword
+
+Conclusion :
+
+
+To define a closure we need an inner function that:
+1-It should be returned by the outer function.
+2- it should capture some of the nonlocal variables of the outer function. This can be done by accessing those variables, or defining them as a nonlocal variable or having a nested closure that needs to capture them.
+
+
+
+
+
+
+
