@@ -88,6 +88,7 @@ class AdjGraph:
                         result.append(v)
                         break
                 if not flag:
+                    print("sa")
                     stack.pop()
             else:
                 stack.pop()
@@ -109,12 +110,15 @@ if __name__ == "__main__":
 
     obj.add_edge(0,1)
     obj.add_edge(1,2)
-    obj.add_edge(1,3)
-    # obj.add_edge(2,3)
+    obj.add_edge(2,3)
+    obj.add_edge(2,0)
+    obj.add_edge(0,2)
+    obj.add_edge(3,3)
+
 
 
     obj.display()
-    obj.bfs(0)
-    obj.dfs(0)
-    obj.dfs_recursive_call(0)
-    print("cycle present status ",obj.iscycle())
+    # obj.bfs(0)
+    obj.dfs(2)
+    # obj.dfs_recursive_call(0)
+    # print("cycle present status ",obj.iscycle())
