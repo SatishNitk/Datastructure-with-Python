@@ -1,0 +1,46 @@
+
+***************** ITERATOR *******************************
+An iterator in Python refers to an object that we can iterate upon. The iterator consists of countable values, and it is possible to traverse through these values, one by one.
+
+
+Python iterator objects are required to support two methods while following the iterator protocol.
+
+__iter__ returns the iterator object itself. This is used in for and in statements.
+
+__next__ method returns the next value from the iterator. If there is no more items to return then it should raise StopIteration exception.
+
+
+@@@ ADVANTAGE :-  ******************************
+With iterators, it is easy for us to work with sequences of items in Python. We don't have to allocate computing resources to all the items in the sequence, rather we iterate upon single item at a time which helps us save the memory space.
+*******************************************************
+
+class Counter(object):
+    def __init__(self, low, high):
+        self.current = low
+        self.high = high
+
+    def __iter__(self):
+        'Returns itself as an iterator object'
+        return self
+
+    def __next__(self):
+        'Returns the next value till current is lower than high'
+        if self.current > self.high:
+            raise StopIteration
+        else:
+            self.current += 1
+            return self.current - 1
+
+>>> c = Counter(5,10)
+>>> for i in c:
+...   print(i, end=' ')
+...
+5 6 7 8 9 10
+
+
+
+
+Conclusion
+Iterators are extremely useful, especially if you need to iterate through a large sequence of items. Iterators allow you to iterate through a sequence of items one at a time without having to load all the items in to memory at once.
+
+

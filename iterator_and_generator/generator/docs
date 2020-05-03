@@ -1,0 +1,164 @@
+************ INTRODUCTION ***********************
+A Python generator is a function that produces a sequence of results. It works by maintaining its local state, so that the function can resume again exactly where it left off when called subsequent times. Thus, you can think of a generator as something like a powerful iterator.
+
+
+************** The Difference Between return and yield*********************
+The keyword return returns a value from a function, at which time the function then loses its local state. Thus, the next time we call that function, it starts over from its first statement.
+
+On the other hand, yield maintains the state between function calls, and resumes from where it left off when we call the next() method again. So if yield is called in the generator, then the next time the same generator is called we'll pick right back up after the last yield statement
+
+**
+A common use case of generators is to work with data streams or large files, like CSV files. **
+
+
+
+
+
+def numberGenerator(n):
+     number = 0
+     while number < n:
+         yield number
+         number += 1
+
+g = numberGenerator(10)
+
+counter = 0
+
+while counter < 10:
+    print(next(g))
+    counter += 1
+
+
+*****************Connecting Generators ********************
+
+Since Python 3.3, a new feature allows generators to connect themselves and delegate to a sub-generator.
+
+yield from <expression>
+
+
+def myGenerator1(n):
+    for i in range(n):
+        yield i
+
+def myGenerator2(n, m):
+    for j in range(n, m):
+        yield j
+
+def myGenerator3(n, m):
+    yield from myGenerator1(n)
+    yield from myGenerator2(n, m)
+    yield from myGenerator2(m, m+5)
+
+print(list(myGenerator1(5)))
+print(list(myGenerator2(5, 10)))
+print(list(myGenerator3(0, 10))) 
+
+o/p :- 
+[0, 1, 2, 3, 4]
+[5, 6, 7, 8, 9]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+
+
+
+
+
+**************EXAMPLE WITH PROBLEM AND SOLUTION __******************
+
+ EX-1  Reading Large Files
+
+
+csv_gen = csv_reader("some_csv.txt")
+row_count = 0
+
+for row in csv_gen:
+    row_count += 1
+
+print(f"Row count is {row_count}")
+
+Looking at this example, you might expect csv_gen to be a list. To populate this list, csv_reader() opens a file and loads its contents into csv_gen. Then, the program iterates over the list and increments row_count for each row
+
+
+This is a reasonable explanation, but would this design still work if the file is very large? What if the file is larger than the memory you have available?  To answer this question, let’s assume that csv_reader() just opens the file and reads it into an array:
+
+
+def csv_reader(file_name):
+    file = open(file_name)
+    result = file.read().split("\n")
+    return result
+
+
+This function opens a given file and uses file.read() along with .split() to add each line as a separate element to a list.
+
+
+if we have larger file than available memory we will get memory Error
+because file.read().split() loads everything into memory at once, causing the MemoryError.
+
+
+** SO  Solution is generator here
+def csv_reader(file_name):
+    for row in open(file_name, "r"):
+        yield row
+
+In this version, you open the file, iterate through it, and yield a row by row, it loads one row at a time in a memory
+
+
+
+
+
+ **********************generator comprehension or generator expression *****************
+
+ csv_gen = (row for row in open(file_name))  # will return generator object
+
+ or
+
+
+EX - 2
+
+iterator = ('Hello' for i in range(3))  # will return generator object
+for i in iterator:
+    print(i)
+
+o/p  hello hello hello
+Same as ex-2 :----------
+
+def bounded_repeater(value, max_repeats):
+    for i in range(max_repeats):
+        yield value
+
+iterator = bounded_repeater('Hello', 3)
+
+for i  in iterator:
+    print(i)
+
+o/p  hello hello hello
+
+or
+
+>>> genexpr = ('Hello' for i in range(3))
+>>> list(genexpr)
+['Hello', 'Hello', 'Hello']
+
+
+
+or
+
+even_squares = (x * x for x in range(10) if x % 2 == 0)
+print(list(even_squares))
+
+
+
+
+
+iterator                  
+class based Iterator ---- generator(yield) ---- generator expression(generator comprehention)
+
+
+
+
+
+
+
+
+
+
